@@ -105,4 +105,5 @@ const platformDetails = (args.length === 1) ? JSON.parse(args[0]) : getPlatformD
 const version = await fetchLatestNodeVersion();
 const fileName = await downloadNodeBinary(version, platformDetails.platform, platformDetails.arch);
 fs.copyFileSync(fileName,folderName);
+console.log("copying file");
 console.log(fileName);
