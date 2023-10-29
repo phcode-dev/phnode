@@ -1,0 +1,24 @@
+name: Schedule Node.js Script
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
+
+jobs:
+  run-node-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # You can specify your Node.js version here
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run script
+        run: node src/nodeDownloader.js
