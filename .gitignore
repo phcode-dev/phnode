@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node-bins
+src-build/node-*
+src-tauri/node-*
+src-tauri/src-node
+src-build/phnode-*
+src-tauri/phnode-*
+src-tauri/tauri-local.conf.json
+phoenix
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/extensions.json
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
