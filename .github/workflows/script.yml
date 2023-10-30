@@ -54,13 +54,13 @@ jobs:
           asset_files="${asset_files//'%'/'%25'}"
           asset_files="${asset_files//$'\n'/'%0A'}"
           asset_files="${asset_files//$'\r'/'%0D'}"
-          echo "::set-output name=asset_files::$asset_files"
+          echo "asset_files=$asset_files" >> $GITHUB_ENV
 
       - name: Upload Release Assets
         if: env.new_version != ''
         run: |
-          asset_files="${{ steps.find_assets.outputs.asset_files }}"
-          for asset_file in $asset_files; do
+          readarray -t asset_files <<< "${{ env.asset_files }}"
+          for asset_file in "${asset_files[@]}"; do
             asset_name=$(basename "$asset_file")
             echo "Uploading asset: $asset_file"
             gh release upload ${{ env.new_version }} "$asset_file" --clobber -R ${{ github.repository }}
