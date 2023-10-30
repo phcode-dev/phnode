@@ -35,7 +35,7 @@ jobs:
         if: env.new_version != ''
         run: node src/download.js
 
-      - name: Create Release
+      - name: Create Draft Release
         if: env.new_version != ''
         id: create_release
         uses: actions/create-release@v1
@@ -44,7 +44,7 @@ jobs:
         with:
           tag_name: ${{ env.new_version }}
           release_name: Node.js ${{ env.new_version }} LTS Release
-          draft: false
+          draft: true
           prerelease: false
       - name: Find Asset Files
         if: env.new_version != ''
@@ -60,7 +60,6 @@ jobs:
         if: env.new_version != ''
         run: |
           asset_files="${{ steps.find_assets.outputs.asset_files }}"
-          upload_url="${{ steps.create_release.outputs.upload_url }}"
           for asset_file in $asset_files; do
             asset_name=$(basename "$asset_file")
             echo "Uploading asset: $asset_file"
@@ -68,3 +67,14 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Release
+        if: env.new_version != ''
+        run: |
+          release_id=$(jq --raw-output .id "$GITHUB_ENV_PATH/../create_release/response.json")
+          curl \
+            -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"draft": false}' \
+            "https://api.github.com/repos/${{ github.repository }}/releases/$release_id"
