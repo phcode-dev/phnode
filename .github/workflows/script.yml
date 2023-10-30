@@ -19,6 +19,40 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
+      - name: Check Node.js LTS Version
+        run: |
+          latest_lts_version=$(node src/getLatestNodeVersion.js)
+          echo "Latest LTS version: $latest_lts_version"
+          response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/releases/tags/$latest_lts_version)
+          existing_release=$(echo $response | jq -r '.message // "not found"')
+          if [ "$existing_release" = "Not Found" ]; then
+            echo "New Node.js LTS version detected: $latest_lts_version"
+            echo "new_version=$latest_lts_version" >> $GITHUB_ENV
+          else
+            echo "No new Node.js LTS version found."
+            echo "new_version=" >> $GITHUB_ENV
+          fi
       - name: Run script
+        if: env.new_version != ''
         run: node src/nodeDownloader.js
+
+      - name: Create Release
+        if: env.new_version != ''
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.new_version }}
+          release_name: Node.js ${{ env.new_version }} LTS Release
+          draft: false
+          prerelease: false
+      - name: Upload Release Assets
+        if: env.new_version != ''
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: src/assets/
+          asset_name: ${{ env.new_version }}
+          asset_content_type: application/zip

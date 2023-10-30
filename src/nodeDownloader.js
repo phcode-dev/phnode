@@ -3,7 +3,7 @@ import * as os from "os";
 import * as fs from "fs";
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
-import platforms from "./platforms.json"  assert { type: 'json' };
+
 
 const LTS_URL_PREFIX = 'https://nodejs.org/dist/latest-v20.x/';
 
@@ -12,7 +12,7 @@ const LTS_URL_PREFIX = 'https://nodejs.org/dist/latest-v20.x/';
  @returns {Promise<string>} A promise that resolves with the latest Node.js version string on success,
   or rejects with an error if the latest version cannot be found.
  */
-async function fetchLatestNodeVersion() {
+    export async function fetchLatestNodeVersion() {
     return new Promise((resolve, reject) => {
         https.get(LTS_URL_PREFIX, (res) => {
             let data = '';
@@ -50,7 +50,7 @@ function getAssetsFolder() {
  * @throws {Error} - If the file fails to download after the maximum number of retries.
  */
 
-async function downloadNodeBinary(version, platform, arch) {
+export async function downloadNodeBinary(version, platform, arch) {
     const extension = (platform === "win") ? "zip" : "tar.gz";
     const fileName = `node-v${version}-${platform}-${arch}.${extension}`;
     const assets = getAssetsFolder()
@@ -105,9 +105,3 @@ export function getPlatformDetails() {
     }
 }
 
-const supportedPlatforms = platforms.configurations;
-const version = await fetchLatestNodeVersion();
-for (const platform of supportedPlatforms){
-    const fileName = await downloadNodeBinary(version, platform.platform, platform.arch);
-    console.log(fileName);
-}
