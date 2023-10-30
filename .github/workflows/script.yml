@@ -2,7 +2,7 @@ name: Schedule Node.js Script
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour
+    - cron: '*/10 * * * *'
 
 jobs:
   run-node-script:
@@ -38,6 +38,7 @@ jobs:
 
       - name: Create Release
         if: env.new_version != ''
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,13 +47,25 @@ jobs:
           release_name: Node.js ${{ env.new_version }} LTS Release
           draft: false
           prerelease: false
+      - name: Find Asset Files
+        if: env.new_version != ''
+        id: find_assets
+        run: |
+          asset_files=$(find src/assets -type f)
+          asset_files="${asset_files//'%'/'%25'}"
+          asset_files="${asset_files//$'\n'/'%0A'}"
+          asset_files="${asset_files//$'\r'/'%0D'}"
+          echo "::set-output name=asset_files::$asset_files"
+
       - name: Upload Release Assets
         if: env.new_version != ''
-        uses: actions/upload-release-asset@v1
+        run: |
+          asset_files="${{ steps.find_assets.outputs.asset_files }}"
+          upload_url="${{ steps.create_release.outputs.upload_url }}"
+          for asset_file in $asset_files; do
+            asset_name=$(basename "$asset_file")
+            echo "Uploading asset: $asset_file"
+            gh release upload ${{ env.new_version }} "$asset_file" --clobber -R ${{ github.repository }} -t ${{ secrets.GITHUB_TOKEN }}
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src/assets/
-          asset_name: ${{ env.new_version }}
-          asset_content_type: application/zip
