@@ -3,6 +3,7 @@ import * as os from "os";
 import * as fs from "fs";
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
+import platforms from "./platforms.json"  assert { type: 'json' };
 
 const LTS_URL_PREFIX = 'https://nodejs.org/dist/latest-v20.x/';
 
@@ -104,8 +105,9 @@ export function getPlatformDetails() {
     }
 }
 
-let args = process.argv.slice(2);
-
-const platformDetails = (args.length === 1) ? JSON.parse(args[0]) : getPlatformDetails();
+const supportedPlatforms = platforms.configurations;
 const version = await fetchLatestNodeVersion();
-const fileName = await downloadNodeBinary(version, platformDetails.platform, platformDetails.arch);
+for (const platform of supportedPlatforms){
+    const fileName = await downloadNodeBinary(version, platform.platform, platform.arch);
+    console.log(fileName);
+}
