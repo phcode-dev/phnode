@@ -32,6 +32,14 @@ async function fetchLatestNodeVersion() {
     });
 }
 
+function getAssetsFolder() {
+    const fullyQualifiedFileName = fileURLToPath(import.meta.url);
+    const assets = `${dirname(fullyQualifiedFileName)}/assets`;
+    fs.mkdirSync(assets, {recursive: true});
+    return assets;
+
+}
+
 /**
  * Downloads a Node.js binary file from a specified version, platform, and architecture.
  * @param {string} version - The version of Node.js to download (e.g., "14.17.0").
@@ -44,9 +52,8 @@ async function fetchLatestNodeVersion() {
 async function downloadNodeBinary(version, platform, arch) {
     const extension = (platform === "win") ? "zip" : "tar.gz";
     const fileName = `node-v${version}-${platform}-${arch}.${extension}`;
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    const fullPath = `${__dirname}/${fileName}`
+    const assets = getAssetsFolder()
+    const fullPath = `${assets}/${fileName}`
     // Check if the file already exists
     if (fs.existsSync(fullPath)) {
         console.log(`File ${fileName} already exists. No need to download.`);
@@ -99,11 +106,6 @@ export function getPlatformDetails() {
 
 let args = process.argv.slice(2);
 
-const folderName="temp";
-fs.mkdirSync(folderName);
 const platformDetails = (args.length === 1) ? JSON.parse(args[0]) : getPlatformDetails();
 const version = await fetchLatestNodeVersion();
 const fileName = await downloadNodeBinary(version, platformDetails.platform, platformDetails.arch);
-fs.copyFileSync(fileName,folderName);
-console.log("copying file");
-console.log(fileName);
