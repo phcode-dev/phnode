@@ -1,4 +1,4 @@
-# PHNode Project
+# PhNode Project
 
 Welcome to the PHNode Project repository. This project is designed to facilitate reliable and consistent access to the latest Long Term Support (LTS) version of Node.js across various platforms. By caching Node.js versions directly in this repository, we aim to mitigate potential workflow disruptions caused by direct downloads from nodejs.org.
 
