@@ -59,7 +59,9 @@ jobs:
       - name: Upload Release Assets
         if: env.new_version != ''
         run: |
-          readarray -t asset_files <<< "${{ env.asset_files }}"
+          asset_files="${{ env.asset_files }}"
+          asset_files="${asset_files//'%0A'/$'\n'}"
+          readarray -t asset_files <<< "$asset_files"
           for asset_file in "${asset_files[@]}"; do
             asset_name=$(basename "$asset_file")
             echo "Uploading asset: $asset_file"
