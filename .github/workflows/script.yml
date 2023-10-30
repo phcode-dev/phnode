@@ -71,7 +71,7 @@ jobs:
       - name: Publish Release
         if: env.new_version != ''
         run: |
-          release_id=$(jq --raw-output .id "$GITHUB_ENV_PATH/../create_release/response.json")
+          release_id="${{ steps.create_release.outputs.id }}"
           curl \
             -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
