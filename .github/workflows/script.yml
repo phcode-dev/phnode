@@ -2,8 +2,7 @@ name: Schedule Node.js Script
 
 on:
   schedule:
-    - cron: '0 0 * * *'
-
+    - cron: '0 * * * *' # Runs every hour
 jobs:
   run-node-script:
     runs-on: ubuntu-latest
