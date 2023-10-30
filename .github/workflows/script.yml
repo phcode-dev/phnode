@@ -2,7 +2,7 @@ name: Schedule Node.js Script
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '0 0 * * *'
 
 jobs:
   run-node-script:
@@ -34,7 +34,7 @@ jobs:
           fi
       - name: Run script
         if: env.new_version != ''
-        run: node src/nodeDownloader.js
+        run: node src/download.js
 
       - name: Create Release
         if: env.new_version != ''
