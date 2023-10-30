@@ -64,7 +64,7 @@ jobs:
           for asset_file in $asset_files; do
             asset_name=$(basename "$asset_file")
             echo "Uploading asset: $asset_file"
-            gh release upload ${{ env.new_version }} "$asset_file" --clobber -R ${{ github.repository }} -t ${{ secrets.GITHUB_TOKEN }}
+            gh release upload ${{ env.new_version }} "$asset_file" --clobber -R ${{ github.repository }}
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
