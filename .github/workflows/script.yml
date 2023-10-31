@@ -1,4 +1,4 @@
-name: Schedule Node.js Script
+name: Schedule Node.js LTS download
 
 on:
   schedule:
@@ -18,20 +18,21 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
       - name: Check Node.js LTS Version
         run: |
           latest_lts_version=$(node src/getLatestNodeVersion.js)
           echo "Latest LTS version: $latest_lts_version"
-          response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/releases/tags/$latest_lts_version)
-          existing_release=$(echo $response | jq -r '.message // "not found"')
-          if [ "$existing_release" = "Not Found" ]; then
+          existing_release=$(gh release view --json tagName --jq '.tagName' | sort -V | tail -n 1)
+          if [ "$(printf "$latest_lts_version\n$existing_release" | sort -V | tail -n 1)" = "$latest_lts_version" ] && [ "$latest_lts_version" != "$existing_release" ]; then
             echo "New Node.js LTS version detected: $latest_lts_version"
             echo "new_version=$latest_lts_version" >> $GITHUB_ENV
           else
-            echo "No new Node.js LTS version found."
+            echo "No new Node.js LTS version found or existing version is the same."
             echo "new_version=" >> $GITHUB_ENV
           fi
-      - name: Run script
+
+      - name: Download Node
         if: env.new_version != ''
         run: node src/download.js
 
@@ -46,6 +47,7 @@ jobs:
           name: Node.js ${{ env.new_version }} LTS Release
           draft: true
           prerelease: false
+
       - name: Find Asset Files
         if: env.new_version != ''
         id: find_assets
