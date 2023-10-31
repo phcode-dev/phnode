@@ -21,7 +21,6 @@ jobs:
 
       - name: Check Node.js LTS Version
         run: |
-          set -x
           latest_lts_version=$(node src/getLatestNodeVersion.js)
           echo "Latest LTS version: $latest_lts_version"
           existing_release=$(gh release view --json tagName --jq '.tagName' | sort -V | tail -n 1)
