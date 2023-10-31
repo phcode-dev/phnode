@@ -63,6 +63,8 @@ jobs:
         run: |
           asset_files="${{ env.asset_files }}"
           asset_files="${asset_files//'%0A'/$'\n'}"
+          asset_files="${asset_files//'%25'/$'%'}"
+          asset_files="${asset_files//'%0D'/$'\r'}"
           readarray -t asset_files <<< "$asset_files"
           for asset_file in "${asset_files[@]}"; do
             asset_name=$(basename "$asset_file")
