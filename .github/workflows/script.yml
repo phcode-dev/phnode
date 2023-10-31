@@ -24,6 +24,7 @@ jobs:
           latest_lts_version=$(node src/getLatestNodeVersion.js)
           echo "Latest LTS version: $latest_lts_version"
           existing_release=$(gh release view --json tagName --jq '.tagName' | sort -V | tail -n 1)
+          echo "existing_release: $existing_release"
           if [ "$(printf "$latest_lts_version\n$existing_release" | sort -V | tail -n 1)" = "$latest_lts_version" ] && [ "$latest_lts_version" != "$existing_release" ]; then
             echo "New Node.js LTS version detected: $latest_lts_version"
             echo "new_version=$latest_lts_version" >> $GITHUB_ENV
