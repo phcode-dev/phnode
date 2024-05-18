@@ -40,18 +40,6 @@ jobs:
         if: env.new_version != ''
         run: node src/download.js
 
-      - name: Upload Node To S3
-        if: env.new_version != ''
-        uses: keithweaver/aws-s3-github-action@v1.0.0
-        with:
-          command: cp
-          source: ./src/assets/
-          destination: s3://phnode/
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-east-1
-          flags: --recursive
-
       - name: Create Draft Release
         if: env.new_version != ''
         id: create_release
