@@ -42,7 +42,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Node
-        if: env.new_version != ''
+#        if: env.new_version != ''
         run: node src/download.js
 
       - name: Upload Node To S3
