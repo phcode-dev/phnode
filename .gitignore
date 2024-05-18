@@ -16,6 +16,8 @@ src-tauri/phnode-*
 src-tauri/tauri-local.conf.json
 phoenix
 
+src/assets
+
 node_modules
 dist
 dist-ssr
