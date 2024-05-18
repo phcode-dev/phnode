@@ -1,13 +1,8 @@
 name: Schedule Node.js LTS download
 
 on:
-  push:
-    branches:
-      - main
-
-#on:
-#  schedule:
-#    - cron: '0 * * * *' # Runs every hour
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
 
 jobs:
   run-node-script:
@@ -42,10 +37,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Node
-#        if: env.new_version != ''
+        if: env.new_version != ''
         run: node src/download.js
 
       - name: Upload Node To S3
+        if: env.new_version != ''
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
