@@ -2,7 +2,7 @@ name: Schedule Node.js LTS download
 
 on:
   schedule:
-    - cron: '0 12 * * *' # Runs at 12:00 PM (noon) daily
+    - cron: '0 0 * * 0' # Runs every Sunday at midnight
 
 jobs:
   run-node-script:
