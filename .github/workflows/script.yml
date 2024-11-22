@@ -1,8 +1,12 @@
 name: Schedule Node.js LTS download
 
 on:
+  workflow_dispatch: # Allows manual triggering from the Actions tab
   schedule:
-    - cron: '0 * * * *' # Runs every hour
+    - cron: '0 0 * * *'
+  push:
+    branches:
+      - action
 
 jobs:
   run-node-script:
