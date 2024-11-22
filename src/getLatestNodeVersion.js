@@ -1,3 +1,13 @@
-import {fetchLatestNodeVersion} from "./nodeDownloader.js";
+import { fetchLatestNodeVersion } from "./nodeDownloader.js";
 
-console.log(await fetchLatestNodeVersion());
+(async () => {
+    try {
+        const latestVersion = await fetchLatestNodeVersion();
+        console.log(latestVersion);
+    } catch (error) {
+        console.error('Error fetching the latest Node.js version:', error.message);
+    } finally {
+        process.exit(0); // Ensure the process exits after execution
+    }
+})();
+

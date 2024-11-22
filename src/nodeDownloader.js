@@ -4,34 +4,55 @@ import * as fs from "fs";
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 
+import { URL } from 'url';
 
 const LTS_URL_PREFIX = 'https://nodejs.org/dist/latest-v20.x/';
 
 /**
- Fetches the latest Node.js version by making a request to a specified URL.
- @returns {Promise<string>} A promise that resolves with the latest Node.js version string on success,
-  or rejects with an error if the latest version cannot be found.
+ * Fetches the latest Node.js version by making a request to a specified URL.
+ * @returns {Promise<string>} A promise that resolves with the latest Node.js version string on success,
+ * or rejects with an error if the latest version cannot be found.
  */
-    export async function fetchLatestNodeVersion() {
+export async function fetchLatestNodeVersion() {
     return new Promise((resolve, reject) => {
-        https.get(LTS_URL_PREFIX, (res) => {
-            let data = '';
-
-            res.on('data', (chunk) => {
-                data += chunk;
-            });
-            res.on('end', () => {
-
-                const versionMatch = /node-v(\d+\.\d+\.\d+)/.exec(data);
-                if (versionMatch) {
-                    resolve(versionMatch[1]);
-                } else {
-                    reject(new Error('Could not find latest Node.js version'));
+        const fetch = (url) => {
+            https.get(url, (res) => {
+                if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                    const redirectUrl = new URL(res.headers.location, url).href;
+                    fetch(redirectUrl);
+                    return;
                 }
-            });
-        }).on('error', reject);
+
+                if (res.statusCode !== 200) {
+                    reject(new Error(`Request failed with status code: ${res.statusCode}`));
+                    return;
+                }
+
+                let data = '';
+
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+
+                res.on('end', () => {
+                    try {
+                        const versionMatch = /node-v(\d+\.\d+\.\d+)/.exec(data);
+                        if (versionMatch) {
+                            resolve(versionMatch[1]);
+                        } else {
+                            reject(new Error('Could not find the latest Node.js version in the data.'));
+                        }
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }).on('error', reject);
+        };
+
+        fetch(LTS_URL_PREFIX);
     });
 }
+
 
 function getAssetsFolder() {
     const fullyQualifiedFileName = fileURLToPath(import.meta.url);
