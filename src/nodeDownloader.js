@@ -72,42 +72,64 @@ function getAssetsFolder() {
  */
 
 export async function downloadNodeBinary(version, platform, arch) {
-    const extension = (platform === "win") ? "zip" : "tar.gz";
+    const extension = platform === 'win' ? 'zip' : 'tar.gz';
     const fileName = `node-v${version}-${platform}-${arch}.${extension}`;
-    const assets = getAssetsFolder()
-    const fullPath = `${assets}/${fileName}`
+    const assets = getAssetsFolder();
+    const fullPath = `${assets}/${fileName}`;
+
     // Check if the file already exists
     if (fs.existsSync(fullPath)) {
         console.log(`File ${fileName} already exists. No need to download.`);
         return fileName;
     }
-    const MAX_RETRIES = 3
-    console.log(`downloading node ${version} for ${platform} ${arch}`);
+
+    const MAX_RETRIES = 3;
+    console.log(`Downloading Node.js ${version} for ${platform} ${arch}`);
+
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         try {
-            const file = fs.createWriteStream(fullPath);
             await new Promise((resolve, reject) => {
                 const downloadUrl = `${LTS_URL_PREFIX}node-v${version}-${platform}-${arch}.${extension}`;
-                console.log(downloadUrl);
-                https.get(downloadUrl, (res) => {
-                    res.pipe(file);
-                    res.on('end', () => resolve(fileName));
-                    res.on('error', (err) => {
-                        fs.unlinkSync(fileName); // Remove the file on error
-                        reject(err);
-                    });
-                });
+                const fetch = (url) => {
+                    https.get(url, (res) => {
+                        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                            const redirectUrl = new URL(res.headers.location, url).href;
+                            console.log(`Redirecting to: ${redirectUrl}`);
+                            fetch(redirectUrl); // Follow the redirect
+                            return;
+                        }
+
+                        if (res.statusCode !== 200) {
+                            reject(new Error(`Request failed with status code: ${res.statusCode}`));
+                            return;
+                        }
+
+                        const file = fs.createWriteStream(fullPath);
+
+                        res.pipe(file);
+                        res.on('end', () => resolve(fileName));
+                        res.on('error', (err) => {
+                            fs.unlinkSync(fullPath); // Remove the file on error
+                            reject(err);
+                        });
+                    }).on('error', reject);
+                };
+
+                fetch(downloadUrl);
             });
+
             return fileName; // If the download was successful, return the file name
         } catch (err) {
-            console.error(`Download attempt ${attempt + 1} failed.`);
+            console.error(`Download attempt ${attempt + 1} failed: ${err.message}`);
             if (attempt < MAX_RETRIES - 1) {
-                console.log(`Retrying download...`);
+                console.log('Retrying download...');
             }
         }
     }
+
     throw new Error(`Failed to download file after ${MAX_RETRIES} attempts.`);
 }
+
 
 /**
  * Retrieves platform details including the operating system platform and architecture.
