@@ -1,5 +1,7 @@
 import { downloadNodeBinary, fetchLatestNodeVersion } from "./nodeDownloader.js";
-import platforms from "./platforms.json" assert { type: 'json' };
+import fs from 'fs';
+const platforms = JSON.parse(fs.readFileSync('./platforms.json', 'utf-8'));
+
 
 (async () => {
     try {
