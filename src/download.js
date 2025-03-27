@@ -1,5 +1,6 @@
 import { downloadNodeBinary, fetchLatestNodeVersion } from "./nodeDownloader.js";
 import { fileURLToPath } from 'url';
+import path from 'path';
 import fs from 'fs';
 // Get the directory of the current module
 const __filename = fileURLToPath(import.meta.url);
