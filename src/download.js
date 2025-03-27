@@ -1,7 +1,11 @@
 import { downloadNodeBinary, fetchLatestNodeVersion } from "./nodeDownloader.js";
 import fs from 'fs';
-const platforms = JSON.parse(fs.readFileSync('./platforms.json', 'utf-8'));
+// Get the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Use an absolute path to the platforms.json file
+const platforms = JSON.parse(fs.readFileSync(path.join(__dirname, 'platforms.json'), 'utf-8'));
 
 (async () => {
     try {
