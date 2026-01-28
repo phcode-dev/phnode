@@ -6,7 +6,7 @@ import {dirname} from 'path';
 
 import { URL } from 'url';
 
-const LTS_URL_PREFIX = 'https://nodejs.org/dist/latest-v20.x/';
+const LTS_URL_PREFIX = 'https://nodejs.org/dist/latest-v24.x/';
 
 /**
  * Fetches the latest Node.js version by making a request to a specified URL.
